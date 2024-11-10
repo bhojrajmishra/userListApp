@@ -39,10 +39,7 @@ class MainActivity : AppCompatActivity() {
                     2
                 )
         }
-        myList.observe(this, Observer {
-            val arrayAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, it.getOrNull()!!)
-            listView.adapter = arrayAdapter
-        })
+
     }
 
 
