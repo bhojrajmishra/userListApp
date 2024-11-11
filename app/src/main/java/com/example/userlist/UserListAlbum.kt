@@ -1,10 +1,14 @@
 package com.example.userlist.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity(tableName = "users")
 data class UserList(
+    @PrimaryKey(autoGenerate = true)
     @SerializedName("id")
-    val id: Int,
+    val id: Int = 0,
     @SerializedName("email")
     val email: String,
     @SerializedName("first_name")
@@ -14,7 +18,7 @@ data class UserList(
     @SerializedName("avatar")
     val avatar: String
 ) {
-    // Override toString to display user information in ListView
+    // this function is used to display the user's full name and email in the ListView
     override fun toString(): String {
         return "$firstName $lastName\n$email"
     }
