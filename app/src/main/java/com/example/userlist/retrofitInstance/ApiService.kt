@@ -1,12 +1,10 @@
 package com.example.userlist.retrofitInstance
 
-import com.example.userlist.UserListAlbum
-import okhttp3.Response
+import com.example.userlist.model.UsersResponse
+import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Query
 
 interface ApiService {
-
-    @GET("users?page=2p")
-    suspend fun getSpecificAlbums(@Query("userId") userId:Int)  : Result<UserListAlbum>
+    @GET("users?page=2")  // Removed typo 'p' from URL
+    suspend fun getUsers(): Response<UsersResponse>
 }

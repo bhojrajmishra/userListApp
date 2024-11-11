@@ -1,47 +1,55 @@
 package com.example.userlist
 
 import android.os.Bundle
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.liveData
-import androidx.tracing.perfetto.handshake.protocol.Response
 import com.example.userlist.retrofitInstance.ApiService
 import com.example.userlist.retrofitInstance.RetrofitInstance
-import com.example.userlist.ui.theme.UserListTheme
 
 class MainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val textView: TextView = findViewById(R.id.textView)
+        val listView: ListView = findViewById(R.id.listView)
+        textView.visibility = View.GONE
 
+        val retrofitService = RetrofitInstance
+            .getRetrofitInstance()
+            .create(ApiService::class.java)
 
-
-        val myList: LiveData<Result<UserListAlbum>> = liveData {
-            val response = RetrofitInstance.getRetrofitInstance().create(ApiService::class.java)
-                .getSpecificAlbums(
-                    2
-                )
+        val responseLiveData = liveData {
+            try {
+                val response = retrofitService.getUsers()
+                emit(response)
+            } catch (e: Exception) {
+                textView.visibility = View.VISIBLE
+                textView.text = "Error: ${e.message}"
+            }
         }
 
+        responseLiveData.observe(this) { response ->
+            if (response.isSuccessful) {
+                val usersResponse = response.body()
+                usersResponse?.let { users ->
+                    val adapter = ArrayAdapter(
+                        this,
+                        android.R.layout.simple_list_item_2,
+                        android.R.id.text1,
+                        users.data
+                    )
+                    listView.adapter = adapter
+                    textView.visibility = View.GONE
+                }
+            } else {
+                textView.visibility = View.VISIBLE
+                textView.text = "Error: ${response.code()} ${response.message()}"
+            }
+        }
     }
-
-
-
-    }
+}
